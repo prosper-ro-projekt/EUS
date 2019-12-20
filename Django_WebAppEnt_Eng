@@ -1,0 +1,173 @@
+Description on Geo-Web Application Development using Django 
+
+Siling Chen
+Last Updated: 20.12.2019
+
+
+----- INSTALLATION 
+1.	Npm (installed with node.js) 
+ (maybe not needed since Django is seperately installed?)
+•	Npm install  
+•	Install leaflet.js and other packages?  
+ 
+2.	Anaconda [4.7.5] -> python [3.6.3] 
+Set up virtual environment to run django 
+Pip install virtual, switch to project folder 
+Virtualenv . 
+Activate 
+Bug of the lateset conda for import geopandas and solving environment --- 
+Conda downgrade https://github.com/conda/conda/issues/9367 
+conda config --set allow_conda_downgrades true 
+conda install conda=4.7.5 
+conda config --set auto_update_conda false 
+•	Pip install: psycopg2 [2.8.2], django [2.2.7], django-bootstrap4 [1.0.1], django-leaflet [0.25.0], django-geojson [2.10.0], django-cors-headers [3.2.0], (rasterstats [0.13.0]), django-chartjs [1.5.0], djangorestframework [3.10.3] 
+ 
+ 
+\\\ NOT directly related to Web App project, but needed for further geoprocessing using python \\\ 
+pip install geos [3.6.2] 
+->  conda install shapely [1.6.4],  
+conda install -c conda-forge fiona [1.7.13]    
+conda install --channel conda-forge   geopandas [0.4.0] 
+•	If problem from lines ‘from fiona.ogrext import …' exists (e.g. in collection.py or _init_.py), change command into: from fiona.ogrext import *) 
+ 
+3.	Other softwares 
+•	QGIS (version 2.18.20 installed, for the plugin GeoServer Explorer not available in the lateset version – 3.10) 
+•	VIsual Studio Code [install python extension <- can be done later when activate 
+        <- writing/reading scripts and VS Code hint pops up] 
+•	(Chrome, Firefox) 
+•	Notepad 
+ 
+4.	Geodjango installation (https://docs.djangoproject.com/en/2.2/ref/contrib/gis/install/#windows) 
+•	Vorher installiert: POSTgreSQL (9.6.16)-> POSTGIS, OSGeo4W, psycopg2 (pip install using Python – see above) ¶ 
+== POSTgreSQL setup: password <wawi2019>  
+•	Last step of installation (setting environment path with run.bat): if not working, open command prompt as administrator, change directory and ‘run.bat’ 
+•	POST-installation: Create USER and Database 
+https://tutorial-extensions.djangogirls.org/en/optional_postgresql_installation/ 
+https://docs.djangoproject.com/en/2.2/ref/contrib/gis/install/postgis/ 
+1) Command Prompt : Run the following by typing it in and hitting return: setx PATH "%PATH%;C:\Program Files\PostgreSQL\9.6\bin” 
+2) OSGeo4W Shell: (???) 
+a.	Cd .\Users\Projekt\Dev\demo 
+b.	psql –U postgres [to enter psql] -> enter password <wawi2019> [as user postgres?] 
+c.	CREATE USER Projekt; 
+d.	CREATE DATABASE projekt OWNER Projekt; 
+e.	Change C:\Program Files\PostgreSQL\9.6\data\pg_hba.conf  
+Local [DATABASE] [USER [METHOD] -> projekt, projekt, md5 
+[the info of this database to be added to the django project settings.py] 
+ 
+ 
+5.	GeoServer [2.16.0] (before: install Java - Java Runtime Environment (JRE) 8) 
+•	Install: https://docs.geoserver.org/stable/en/user/installation/win_binary.html 
+Run cmd as administrator to start GeoServer 
+•	Username: admin, password: geoserver  
+ 
+ 
+----- START: creation and maintenance of online GeoDatabase (GeoServer) 
+If modification of DataBase needed: run command prompt as administrator! 
+[in command prompt]  
+cd ..\..\Program Files\GeoServer\bin 
+startup.bat 
+[browser] http://localhost:8080/geoserver/web 
+•	Create workspace  http://localhost:8080/geoserver/web/DGM (edit work space, at “services” click to activate ‘WMS’) 
+Uploading raster file (“store”, cf Paper documentation) 
+•	 https://publicwiki.deltares.nl/display/OET/Add+GeoTIFF+to+GeoServer)  
+<- before: preparation of raster file (.img to tif to geotiff cf. Written documentation) 
+& Save tif to geotiff (ArcGIS) 
+https://desktop.arcgis.com/en/arcmap/latest/extensions/production-mapping/exporting-to-layout-geotiff.htm 
+ 
+•	Publish wms and layer (GeoServer): https://www.e-education.psu.edu/geog585/node/701 
+https://docs.geoserver.org/stable/en/user/production/container.html#production-container-enable-cors 
+•	Raster upload  
+=== small check, on QGIS WMS add layer using URL: http://localhost:8080/geoserver/[work space name, e.g. DGM]/wms 
+https://www.youtube.com/watch?v=JOzoQPFFzEw 
+===  
+•	Change band display of raster file: 
+https://docs.geoserver.org/latest/en/user/data/raster/coverageview.html 
+•	Export data to GeoServer  
+QGIS: plug in install geoserver explorer (https://www.youtube.com/watch?v=JOzoQPFFzEw) 
+Another SLD raster style plugin not yet checked; needed? 
+ 
+----- START: Create project 
+(anaconda prompt) C:\Users\Projekt 
+Mkdir Dev (create directory) 
+Cd Dev 
+Django-admin startproject demo  
+cd demo 
+python manage.py runserver 
+python manage.py makemigrations 
+python manage.py migrate 
+[create user (add password)]  python manage.py createsuperuser  
+       == username projekt 
+       ==  password <wawi2019> 
+[make new apps – app: pieces of the web] python manage.py startapp [app_name] 
+[issue occured on PC3: gdal library not found <- due to gdalxxx.dll version difference;  codes added in settings.py lines 12-25!] 
+  
+ 
+ 
+ 
++++++++++ +++++++++      Possibly useful links      +++++++ +++++++++       
+ 
+•	Load layers from geoserver in Django https://www.youtube.com/watch?v=rU_Jh6RcY24 
+•	Pop-up when clikc on raster layer: https://astuntechnology.github.io/osgis-ol3-leaflet/leaflet/05-WMS-INFO.html -> BetterWMS.js 
+-> CORS problem on pc3??? 
+ 
+ 
+[NOT USED because CORS problem also existed] Open layer and getFeatureInfo for click and pop-up: https://github.com/walkermatt/ol-layerswitcher 
+ 
+Load raster <- CORS problem 
+•	Change the file for GeoServer (https://gis.stackexchange.com/questions/210109/enabling-cors-in-geoserver-jetty)  
+Edit file: C:\Program Files\GeoServer\webapps\geoserver\WEB-INF\web.xml - two references to CORS: ‘<!-- Uncomment following filter to enable CORS -->’ 
+•	<- try: pip install djangorestframework (https://www.techiediaries.com/django-cors/) 
+https://github.com/adamchainz/django-cors-headers (not sure if it actually helped...)  
+•	https://github.com/adamchainz/django-cors-headers 
+ 
+ 
+ 
+Reload cache if static files changed: Ctrl-F5 to refresh page with cache clearing 
+ 
+ 
+ 
+GeoServer: Style Layer Desciptor  
+https://docs.geoserver.org/stable/en/user/styling/sld/cookbook/rasters.html 
+https://www.e-education.psu.edu/geog585/node/701 
+https://www.e-education.psu.edu/geog585/node/765 
+https://docs.geoserver.org/stable/en/user/styling/sld/cookbook/rasters.html 
+https://docs.geoserver.org/latest/en/user/styling/sld/extensions/rendering-transform.html 
+ 
+ 
+Mapbox maps https://stackoverflow.com/questions/37166172/mapbox-tiles-and-leafletjs 
+Rest-framework (authentification and stuff) https://www.django-rest-framework.org/#requirements 
+ 
+ 
+Trial: pop-up raster value on click 
+New package: https://www.npmjs.com/package/leaflet-canvaslayer-field (install all dependencies on the down-page using npm first) 
+ 
+ 
+Start-page functionalities 
+1.	Button 
+\ Click on ‘process’, pop up window for confirmation -> redirect to a newly-opened webpage 
+ 
+Pop up window https://www.youtube.com/watch?v=gLWIYk0Sd38 
+NOT WORKING WELL  https://www.youtube.com/watch?v=RL6zSbM5gws  
+  
+ 
+Zustand-page functionalities: 
+1.	Charts  
+django-chartjs https://github.com/peopledoc/django-chartjs 
+ Exp          
+pip install django-chartjs 
+2.	Plot maps in a batch (center and polygon shown) 
+3.	Tabs 
+  
+ 
+Query selector (html) https://www.w3schools.com/jsref/met_document_queryselector.asp 
+ 
+ 
+Instead of using geoserver wms to load raster, possible alternative: 
+•	Pip install django-raster (didnt use)  https://django-raster.readthedocs.io/en/stable/tms.html (limit: cooridnate system) 
+•	https://github.com/stuartmatthews/Leaflet.NonTiledLayer.WCS 
+ 
+ 
+https://www.codingforentrepreneurs.com/projects 
+ 
+Database https://dev.to/idrisrampurawala/creating-django-models-of-an-existing-db-288m 
+
